@@ -28,15 +28,15 @@ class base_firewall::post_ipv6 (
     proto => 'all',
     jump  => 'DROP_INPUT',
     chain => 'INPUT',
-  }->
+  }
 
-  firewall { '999 drop all outgoing IPv6':
+  -> firewall { '999 drop all outgoing IPv6':
     proto => 'all',
     jump  => 'DROP_OUTPUT',
     chain => 'OUTPUT',
-  }->
+  }
 
-  firewall { '999 drop all forwarding IPv6':
+  -> firewall { '999 drop all forwarding IPv6':
     proto => 'all',
     jump  => 'DROP_FORWARD',
     chain => 'FORWARD',

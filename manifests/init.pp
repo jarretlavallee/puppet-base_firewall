@@ -124,6 +124,7 @@ class base_firewall(
   }
 
   #----------------------------------------------------------------------------
+  require ::firewall
 
   # Lookup array using hiera so that arrays defined in different files are
   # automatically merged.
@@ -155,16 +156,6 @@ class base_firewall(
     chain_policy => $chain_policy,
   }
 
-  # Include the pre/post rules and ensure that the pre
-  # rules always run before the post rules to prevent
-  # us from being locked out of the system.
-  Firewall {
-    require => [Class['base_firewall::pre_ipv4'],
-                Class['base_firewall::pre_ipv6']],
-    before  => [Class['base_firewall::post_ipv4'],
-                Class['base_firewall::post_ipv6']],
-  }
-
   # Purge any firewall rules not managed by Puppet.
   if $purge {
     resources { 'firewall':
@@ -178,9 +169,21 @@ class base_firewall(
   # parameter lookup would have only returned the highest priority hash.
   $rules = hiera_hash('base_firewall::rules', {})
 
+  # Include the pre/post rules and ensure that the pre
+  # rules always run before the post rules to prevent
+  # us from being locked out of the system.
+  # Avoid dependcency cycle in Puppet 5
+  $defaults = {
+    require => [Class['firewall'],
+                Class['base_firewall::pre_ipv4'],
+                Class['base_firewall::pre_ipv6']],
+    before  => [Class['base_firewall::post_ipv4'],
+                Class['base_firewall::post_ipv6']],
+  }
+
   # Create rules from the given hash.
   if $rules {
-    create_resources(firewall, $rules)
+    create_resources(firewall, $rules, $defaults)
   }
 
   if $manage_logging {

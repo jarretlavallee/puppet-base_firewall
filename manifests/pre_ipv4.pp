@@ -82,28 +82,28 @@ class base_firewall::pre_ipv4 (
     action  => 'accept',
     proto   => 'all',
     iniface => 'lo',
-  }->
+  }
 
   # FIN and SYN are mutually exclusive TCP flags. Attackers
   # set them to do OS fingerprinting.
-  firewall { '005 drop bogus fin,syn':
+  -> firewall { '005 drop bogus fin,syn':
     tcp_flags => 'FIN,SYN FIN,SYN',
     jump      => 'DROP_INPUT',
-  }->
+  }
 
   # SYN and RST are not used together.
-  firewall { '006 drop bogus syn,rst':
+  -> firewall { '006 drop bogus syn,rst':
     tcp_flags => 'SYN,RST SYN,RST',
     jump      => 'DROP_INPUT',
-  }->
+  }
 
-  firewall { '007 allow incoming established, related':
+  -> firewall { '007 allow incoming established, related':
     proto  => 'all',
     state  => ['RELATED', 'ESTABLISHED'],
     action => 'accept',
-  }->
+  }
 
-  firewall { '008 allow incoming icmp echo-requests':
+  -> firewall { '008 allow incoming icmp echo-requests':
     proto  => 'icmp',
     icmp   => 'echo-request',
     action => 'accept',
@@ -124,9 +124,9 @@ class base_firewall::pre_ipv4 (
     action   => 'accept',
     proto    => 'all',
     outiface => 'lo',
-  }->
+  }
 
-  firewall { '005 allow outgoing established, related':
+  -> firewall { '005 allow outgoing established, related':
     chain  => 'OUTPUT',
     proto  => 'all',
     state  => ['ESTABLISHED', 'RELATED'],

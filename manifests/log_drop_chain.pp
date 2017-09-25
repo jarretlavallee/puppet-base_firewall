@@ -33,9 +33,9 @@ define base_firewall::log_drop_chain () {
     log_level  => 7,
     chain      => $drop_chain,
     provider   => $provider,
-  }->
+  }
 
-  firewall { "001 drop ${chain} ${protocol}":
+  -> firewall { "001 drop ${chain} ${protocol}":
     proto    => 'all',
     action   => 'drop',
     chain    => $drop_chain,

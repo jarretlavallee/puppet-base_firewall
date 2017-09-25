@@ -28,15 +28,15 @@ class base_firewall::post_ipv4 (
     proto => 'all',
     jump  => 'DROP_INPUT',
     chain => 'INPUT',
-  }->
+  }
 
-  firewall { '999 drop all outgoing':
+  -> firewall { '999 drop all outgoing':
     proto => 'all',
     jump  => 'DROP_OUTPUT',
     chain => 'OUTPUT',
-  }->
+  }
 
-  firewall { '999 drop all forwarding':
+  -> firewall { '999 drop all forwarding':
     proto => 'all',
     jump  => 'DROP_FORWARD',
     chain => 'FORWARD',
