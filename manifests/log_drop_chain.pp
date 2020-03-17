@@ -1,4 +1,4 @@
-# == Define: base_firewall::log_drop_chain
+#
 #
 # Creates an iptables filter chain that logs traffic and then drops it. This
 # does not install any jumps that point to the chain created by this type.
@@ -6,7 +6,9 @@
 # The title must of the form chain:table:protocol like INPUT:filter:IPv4. The
 # previous example would create a new IPv4 chain titled DROP_INPUT.
 #
-define base_firewall::log_drop_chain () {
+define base_firewall::log_drop_chain (
+  Boolean $enable_logging = $base_firewall::enable_logging,
+) {
 
   $name_parts = split($name, ':')
   $chain = $name_parts[0]
@@ -25,16 +27,18 @@ define base_firewall::log_drop_chain () {
     ensure => present,
   }
 
-  firewall { "000 log dropped ${chain} ${protocol}":
-    proto      => 'all',
-    jump       => 'LOG',
-    limit      => '10/min',
-    log_prefix => "iptables ${drop_chain}: ",
-    log_level  => 7,
-    chain      => $drop_chain,
-    provider   => $provider,
-  }->
-
+  if $enable_logging {
+    firewall { "000 log dropped ${chain} ${protocol}":
+      proto      => 'all',
+      jump       => 'LOG',
+      limit      => '10/min',
+      log_prefix => "iptables ${drop_chain}: ",
+      log_level  => 7,
+      chain      => $drop_chain,
+      provider   => $provider,
+      before     => Firewall["001 drop ${chain} ${protocol}"],
+    }
+  }
   firewall { "001 drop ${chain} ${protocol}":
     proto    => 'all',
     action   => 'drop',
