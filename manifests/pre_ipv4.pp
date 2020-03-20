@@ -18,6 +18,7 @@ class base_firewall::pre_ipv4 (
   $chain_policy,
   $chain_purge,
   $chain_purge_ignore,
+  Boolean $manage_icmp_firewall,
 ) {
 
   # Break dependency cycle and set default provider
@@ -103,12 +104,14 @@ class base_firewall::pre_ipv4 (
     action => 'accept',
   }
 
-  -> firewall { '008 allow incoming icmp echo-requests':
-    proto  => 'icmp',
-    icmp   => 'echo-request',
-    action => 'accept',
+  if $icmp {
+    firewall { '008 allow incoming icmp echo-requests':
+      proto   => 'icmp',
+      icmp    => 'echo-request',
+      action  => 'accept',
+      require => Firewall['007 allow incoming established, related'],
+    }
   }
-
   if $manage_sshd_firewall {
     firewall { '020 allow incoming ssh':
       dport  => $sshd_port,

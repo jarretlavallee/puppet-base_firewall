@@ -97,6 +97,7 @@ class base_firewall(
   Boolean $allow_new_outgoing_ipv4 = false,
   Boolean $allow_new_outgoing_ipv6 = false,
   Boolean $manage_sshd_firewall    = true,
+  Boolean $manage_icmp_firewall    = false,
   Integer $sshd_port               = 22,
   Boolean $purge                   = true,
   Enum['accept', 'drop']  $chain_policy = 'drop',
@@ -124,6 +125,7 @@ class base_firewall(
   class { 'base_firewall::pre_ipv4':
     allow_new_outgoing   => $allow_new_outgoing_ipv4,
     manage_sshd_firewall => $manage_sshd_firewall,
+    manage_icmp_firewall => $manage_icmp_firewall,
     sshd_port            => $sshd_port,
     chain_policy         => $chain_policy,
     chain_purge          => $chain_purge,
