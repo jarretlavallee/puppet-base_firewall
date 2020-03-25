@@ -104,7 +104,7 @@ class base_firewall::pre_ipv4 (
     action => 'accept',
   }
 
-  if $icmp {
+  if $manage_icmp_firewall {
     firewall { '008 allow incoming icmp echo-requests':
       proto   => 'icmp',
       icmp    => 'echo-request',
